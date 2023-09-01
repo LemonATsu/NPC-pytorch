@@ -26,8 +26,7 @@ pip install -r requirements.txt
 
 ```
 ## Training
-We provide template training configurations in `configs/` for different settings. 
-
+You can find relevant training configuration in `configs/`.
 ### Point cloud extraction
 To train NPC, we need to first extract surface point clouds. 
 
@@ -46,16 +45,17 @@ The `config-name npc` corresponds to config file `configs/npc.yaml`, and `datase
 Note that you can change the paths to the point clouds in the config (e.g., [here](https://github.com/LemonATsu/NPC-pytorch/blob/main/configs/npc.yaml#L15)).
 
 ## Testing
-
 You can use [`run_render.py`](run_render.py) to render the learned models under different camera motions, or retarget the character to different poses by
 ```
 python run_render.py --config-name h36m_zju model_config=logs/NPC_h36m_S9/config.yaml +ckpt_path=[path/to/specific/ckpt] output_path=[path/to/output] render_dataset.bkgd_to_use=black
 ```
 Here, we render the dataset as specified in config file `configs/render/h36m_zju.yaml` with the model configuration and weights we saved before, and store the output in `output_path`.
 	
-We also provide a config `configs/render/h36m_zju_mesh.yaml`for extracting meshes with Marching cubes.
+Config files related to rendering or testing the models are located at `configs/render`. For example, we have `configs/render/h36m_zju_mesh.yaml`for extracting meshes with Marching cubes.
 
 ## Dataset
+You can find dataset configuration in `configs/dataset`.
+
 We are not allowed to share the pre-processed data for H3.6M and MonoPerfcap due to license terms. If you need access to the pre-trained models and the pre-processed dataset, please reach out to `shihyang[at]cs.ubc.ca`.
 
 
