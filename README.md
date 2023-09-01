@@ -8,8 +8,6 @@
 This repo also supports [DANBO](https://github.com/LemonATsu/DANBO-pytorch) training.
 
 ## Setup
-
-### Setup environment
 ```
 conda create -n npc python=3.8
 conda activate npc
