@@ -24,6 +24,7 @@ importlib-metadata==6.8.0
 importlib-resources==6.0.1
 iopath==0.1.9
 Jinja2==3.1.2
+kaleido==0.2.1
 kiwisolver==1.4.5
 lit==16.0.6
 lpips==0.1.4
