@@ -6,7 +6,7 @@
 >ICCV 2023
 
 This repo also supports [DANBO](https://github.com/LemonATsu/DANBO-pytorch) training. 
-For ease of comparisons, we provide our [rendering results](https://drive.google.com/file/d/18dpTxbcCi28M_vHduSJxi5TfpBoyUa8Q/view?usp=sharing) for NPC, DANBO, and TAVA on H3.6M. 
+For ease of comparisons, we provide the [rendering results](https://drive.google.com/file/d/18dpTxbcCi28M_vHduSJxi5TfpBoyUa8Q/view?usp=sharing) for NPC, DANBO, and TAVA on H3.6M. 
 
 ## Setup
 ```
