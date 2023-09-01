@@ -1,0 +1,16 @@
+render_dataset:
+  _target_: run_render.AnimalRenderDataset
+  subject: hare
+  h5_path: data/animal/${.subject}_train.h5
+  #h5_path: data/h36m_zju/${.subject}_train.h5
+  #idxs: np.arange(780)
+  #idxs: np.arange(133)
+  #idxs: np.arange(82)
+  idxs: np.arange(6000,8000)[::7]
+  resolution: [500, 500]
+  #cam_overwrite: -1
+  bkgd_to_use: white
+
+
+model_config: ???
+output_path: ???

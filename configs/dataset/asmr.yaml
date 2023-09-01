@@ -1,0 +1,9 @@
+_target_: core.datasets.ASMRDataset
+h5_path: data/ASMR/${.subject}_train.h5
+
+
+split: train
+patch_size: 1
+subject: Luis
+mask_img: True
+perturb_bg: True

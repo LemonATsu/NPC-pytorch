@@ -1,0 +1,15 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# data
+data/
+# logs
+log*/
+render_output*/
+# helper script
+*.sh
+

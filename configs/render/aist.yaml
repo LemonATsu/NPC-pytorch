@@ -1,0 +1,10 @@
+render_dataset:
+  _target_: run_render.BaseRenderDataset
+  subject: d04
+  h5_path: data/AIST/${.subject}_train.h5
+  idxs: np.arange(200)[::4]
+  resolution: [500, 500]
+
+
+model_config: ???
+output_path: ???

@@ -1,0 +1,11 @@
+render_dataset:
+  _target_: run_render.BaseRenderDataset
+  subject: female
+  h5_path: data/surreal/surreal_val_h5py.h5
+  #idxs: np.arange(240, 300)
+  idxs: np.arange(300)[::2]
+  resolution: [1000, 1000]
+
+
+model_config: ???
+output_path: ???
