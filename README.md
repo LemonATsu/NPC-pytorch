@@ -26,20 +26,22 @@ pip install --no-index --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.co
 pip install -r requirements.txt
 
 ```
-
-### Dataset
-We are not allowed to share the pre-processed data for H3.6M and MonoPerfcap due to license terms. If you need access to the pre-trained models and the pre-processed dataset, please reach out to `shihyang[at]cs.ubc.ca`.
-
-You can download pre-extracted point clouds (TODO:) [here](), or modify our [example script](https://github.com/LemonATsu/NPC-pytorch/blob/main/point_extraction.sh) for extracting point clouds with DANBO.
-
 ## Training
 We provide template training configurations in `configs/` for different settings. 
 
-To train NPC on the H36M dataset subject S9, run
+To train NPC, we need to first extract surface point clouds. You can download pre-extracted point clouds (TODO:) [here]() or modify our [example script](https://github.com/LemonATsu/NPC-pytorch/blob/main/point_extraction.sh) for extracting point clouds with DANBO.
+
+```
+./point_extraction.sh # extract point clouds with DANBO
+```
+
+Then, you can train NPC with the following command:
 ```
 python train.py --config-name npc --basedir logs  expname=NPC_h36m_S9 dataset.subject=S9
 ```
 The `config-name npc` corresponds to config file `configs/npc.yaml`, and `dataset.subject=S9` overwrite dataset related configuration, which can be found in `configs/dataset/`. The training logs and checkpoints will be saved in `logs/NPC_h36m_S9/`.
+
+Note that you can change the paths to the point clouds in the config (e.g., [here](https://github.com/LemonATsu/NPC-pytorch/blob/main/configs/npc.yaml#L15)).
 
 ## Testing
 You can use [`run_render.py`](run_render.py) to render the learned models under different camera motions, or retarget the character to different poses by
@@ -49,6 +51,10 @@ python run_render.py --config-name h36m_zju model_config=logs/NPC_h36m_S9/config
 Here, we render the dataset as specified in config file `configs/render/h36m_zju.yaml` with the model configuration and weights we saved before, and store the output in `output_path`.
 	
 We also provide a config `configs/render/h36m_zju_mesh.yaml`for extracting meshes with Marching cubes.
+
+## Dataset
+We are not allowed to share the pre-processed data for H3.6M and MonoPerfcap due to license terms. If you need access to the pre-trained models and the pre-processed dataset, please reach out to `shihyang[at]cs.ubc.ca`.
+
 
 ## Citation
 ```
