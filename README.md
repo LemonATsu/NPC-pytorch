@@ -5,7 +5,8 @@
 >[Shih-Yang Su](https://lemonatsu.github.io/), [Timur Bagautdinov](https://scholar.google.ch/citations?user=oLi7xJ0AAAAJ&hl=en), and [Helge Rhodin](http://helge.rhodin.de/)\
 >ICCV 2023
 
-This repo also supports [DANBO](https://github.com/LemonATsu/DANBO-pytorch) training.
+This repo also supports [DANBO](https://github.com/LemonATsu/DANBO-pytorch) training. 
+For ease of comparisons, we provide our [rendering results](https://drive.google.com/file/d/18dpTxbcCi28M_vHduSJxi5TfpBoyUa8Q/view?usp=sharing) on H3.6M. 
 
 ## Setup
 ```
@@ -42,6 +43,7 @@ The `config-name npc` corresponds to config file `configs/npc.yaml`, and `datase
 Note that you can change the paths to the point clouds in the config (e.g., [here](https://github.com/LemonATsu/NPC-pytorch/blob/main/configs/npc.yaml#L15)).
 
 ## Testing
+
 You can use [`run_render.py`](run_render.py) to render the learned models under different camera motions, or retarget the character to different poses by
 ```
 python run_render.py --config-name h36m_zju model_config=logs/NPC_h36m_S9/config.yaml +ckpt_path=[path/to/specific/ckpt] output_path=[path/to/output] render_dataset.bkgd_to_use=black
