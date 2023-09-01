@@ -58,6 +58,10 @@ You can find dataset configuration in `configs/dataset`.
 
 We are not allowed to share the pre-processed data for H3.6M and MonoPerfcap due to license terms. If you need access to the pre-trained models and the pre-processed dataset, please reach out to `shihyang[at]cs.ubc.ca`.
 
+## TODOs:
+- [ ] Add closest box search as described in the paper
+- [ ] Add support for box-free point clouds
+
 
 ## Citation
 ```
@@ -76,4 +80,3 @@ We are not allowed to share the pre-processed data for H3.6M and MonoPerfcap due
     year={2022}
 }
 ```
-
