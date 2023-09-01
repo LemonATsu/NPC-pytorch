@@ -19,7 +19,8 @@ pip install torch
 
 # install pytorch3d: note that doing `pip install pytorch3d` directly may install an older version with bugs.
 # be sure that you specify the version that matches your CUDA environment. See: https://github.com/facebookresearch/pytorch3d
-pip install pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py38_cu102_pyt190/download.html
+conda install -c fvcore -c iopath -c conda-forge fvcore iopath
+pip install --no-index --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py39_cu114_pyt1110/download.html
 
 # install other dependencies
 pip install -r requirements.txt

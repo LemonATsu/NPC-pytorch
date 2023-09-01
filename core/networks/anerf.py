@@ -591,9 +591,7 @@ class ANeRF(nn.Module):
                 sh = v.shape[1:]
                 v = v.expand(N_rays, *sh)
             else:
-                v_ = v.flatten(end_dim=2)[valid_idxs.to(device)].to(device)
-                v = rearrange(v, 'b h w c -> (b h w) c')[valid_idxs.to(device)].to(device)
-                assert torch.allclose(v_, v)
+                v = rearrange(v, 'b h w c -> (b h w) c')[valid_idxs.to(v.device)].to(device)
             ray_inputs[k] = v
         return ray_inputs
 
