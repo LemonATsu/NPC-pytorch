@@ -23,7 +23,6 @@ model:
   anchor_constraint: True
   pred_sdf: True
   use_viewdir: True
-  block_irrel: True
 
   skips: [4] # skip connection
   use_framecodes: True
@@ -45,6 +44,7 @@ model:
 
   pts_config:
     _target_: ${pts_base}.${pts_name}
+    block_irrel: True
     n_hops: 2
     knn_vols: 3
     knn_pts: 8

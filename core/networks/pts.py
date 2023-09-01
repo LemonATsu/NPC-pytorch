@@ -36,6 +36,7 @@ class NPCPointClouds(nn.Module):
         tar_init: bool = False,
         dropout: float = 0.8,
         use_global_view: bool = False,
+        block_irrel: bool = False,
         **kwargs,
     ):
         super().__init__()
@@ -62,6 +63,7 @@ class NPCPointClouds(nn.Module):
         self.dropout = dropout
         self.tar_init = tar_init
         self.use_global_view = use_global_view
+        self.block_irrel = block_irrel
 
         self.init_pts_info(pts_file, feat_config, bone_config)
     
@@ -473,7 +475,15 @@ class NPCPointClouds(nn.Module):
         knn_vols = self.knn_vols
 
         # hierachical: first find k-closest volume
-        k_vol_idxs = q_bs.norm(dim=-1).topk(dim=-1, k=knn_vols, largest=False)[1]
+        d_vols = q_bs.detach().norm(dim=-1)
+        if self.block_irrel:
+            # find the closest volume
+            closest_vol_idxs = d_vols.argmin(dim=-1)
+            vol_hop_masks = self.hop_masks[closest_vol_idxs]
+
+            # set distance to irrelevant volumes to be large
+            d_vols = d_vols * vol_hop_masks + (1 - vol_hop_masks) * 1e6
+        k_vol_idxs = d_vols.topk(dim=-1, k=knn_vols, largest=False)[1]
 
         # get the corresponding points from the closest volumes
         cand_idxs = pose_idxs[..., None] * N_joints + k_vol_idxs
