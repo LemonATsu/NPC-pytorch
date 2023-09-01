@@ -30,7 +30,7 @@ pip install -r requirements.txt
 ### Dataset
 We are not allowed to share the pre-processed data for H3.6M and MonoPerfcap due to license terms. If you need access to the pre-trained models and the pre-processed dataset, please reach out to `shihyang[at]cs.ubc.ca`.
 
-You can download pre-extracted point clouds (TODO:) [here](), or modify our (TODO:) [example script]() for extracting point clouds with DANBO.
+You can download pre-extracted point clouds (TODO:) [here](), or modify our [example script](https://github.com/LemonATsu/NPC-pytorch/blob/main/point_extraction.sh) for extracting point clouds with DANBO.
 
 ## Training
 We provide template training configurations in `configs/` for different settings. 
