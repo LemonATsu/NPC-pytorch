@@ -542,7 +542,7 @@ class NPC(DANBO):
         if encoded is not None:
             pc_info = encoded['pc_info']
             pc_constraints = encoded.get('pc_constraints', None)
-            to_collect = ['dp', 'p_w', 'pc_sigma', 'pc_grad']
+            to_collect = ['dp', 'dp_uc', 'p_w', 'pc_sigma', 'pc_grad']
             for k in to_collect:
                 if k in pc_info: 
                     ret[k] = pc_info[k]

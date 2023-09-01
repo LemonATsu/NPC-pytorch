@@ -150,7 +150,7 @@ class PointDeformLoss(BaseLoss):
         # in m-unit space
         if batch['device_cnt'] > 1:
             vol_scale = torch.chunk(vol_scale, chunks=batch['device_cnt'], dim=1)[0]
-        dp = preds['dp']
+        dp = preds['dp'] if not ('dp_uc' in preds) else preds['dp_uc']
 
         N_joints = dp.shape[1]
 

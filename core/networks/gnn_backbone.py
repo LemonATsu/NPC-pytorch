@@ -636,6 +636,8 @@ class NPCGNNFiLM(MixGNN):
         film = super().forward(pose)
         f_theta, dp = self.predict_nl_deform(p_j, film, bone_align_T)
 
+        # deformation before clamping
+        dp_uc = dp.clone()
         if clamp_deform:
             dp = clamp_deform_to_max(dp, self.max_deform)
         p_w = dp + p_lbs
@@ -643,6 +645,7 @@ class NPCGNNFiLM(MixGNN):
         return {
             'p_w': p_w,
             'dp': dp,
+            'dp_uc': dp_uc,
             'p_lbs': p_lbs,
             'f_theta': f_theta,
         }
