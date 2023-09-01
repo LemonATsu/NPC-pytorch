@@ -6,7 +6,7 @@
 >ICCV 2023
 
 This repo also supports [DANBO](https://github.com/LemonATsu/DANBO-pytorch) training. 
-For ease of comparisons, we provide our [rendering results](https://drive.google.com/file/d/18dpTxbcCi28M_vHduSJxi5TfpBoyUa8Q/view?usp=sharing) on H3.6M. 
+For ease of comparisons, we provide our [rendering results](https://drive.google.com/file/d/18dpTxbcCi28M_vHduSJxi5TfpBoyUa8Q/view?usp=sharing) for NPC, DANBO, and TAVA on H3.6M. 
 
 ## Setup
 ```
@@ -28,12 +28,15 @@ pip install -r requirements.txt
 ## Training
 We provide template training configurations in `configs/` for different settings. 
 
-To train NPC, we need to first extract surface point clouds. You can download pre-extracted point clouds (TODO:) [here]() or modify our [example script](https://github.com/LemonATsu/NPC-pytorch/blob/main/point_extraction.sh) for extracting point clouds with DANBO.
+### Point cloud extraction
+To train NPC, we need to first extract surface point clouds. 
 
+You can download pre-extracted point clouds [here](https://drive.google.com/drive/folders/1tdTQDgu0lvJWxMu-xOOLxg-ilVos0EB9?usp=sharing) or use our [example script](https://github.com/LemonATsu/NPC-pytorch/blob/main/point_extraction.sh) for extracting point clouds with DANBO by running:
 ```
 ./point_extraction.sh # extract point clouds with DANBO
 ```
 
+### NPC training
 Then, you can train NPC with the following command:
 ```
 python train.py --config-name npc --basedir logs  expname=NPC_h36m_S9 dataset.subject=S9
