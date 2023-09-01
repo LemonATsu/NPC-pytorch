@@ -10,7 +10,7 @@ For ease of comparisons, we provide the [rendering results](https://drive.google
 
 ## Setup
 ```
-conda create -n npc python=3.8
+conda create -n npc python=3.9
 conda activate npc
 
 # install pytorch for your corresponding CUDA environments
