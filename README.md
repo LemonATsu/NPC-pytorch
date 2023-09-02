@@ -1,15 +1,16 @@
 # NPC: Neural Point Characters from Video
+
 ### [Paper](https://https://arxiv.org/abs/2304.02013) | [Supplementary](https://lemonatsu.github.io/files/npc/supp.pdf) | [Website](https://lemonatsu.github.io/npc/) 
 ![](imgs/front.png)
 >**NPC: Neural Point Characters from Video**\
 >[Shih-Yang Su](https://lemonatsu.github.io/), [Timur Bagautdinov](https://scholar.google.ch/citations?user=oLi7xJ0AAAAJ&hl=en), and [Helge Rhodin](http://helge.rhodin.de/)\
 >ICCV 2023
 
+### Updates
+- Sep 2, 2023: Fixed a major bug, and re-uploaded the re-extracted point clouds [here](https://drive.google.com/drive/folders/1tdTQDgu0lvJWxMu-xOOLxg-ilVos0EB9?usp=sharing).
+
 This repo also supports [DANBO](https://github.com/LemonATsu/DANBO-pytorch) training. 
 For ease of comparisons, we provide the [rendering results](https://drive.google.com/file/d/18dpTxbcCi28M_vHduSJxi5TfpBoyUa8Q/view?usp=sharing) for NPC, DANBO, and TAVA on H3.6M. 
-
-### Updates
-Sep 2, 23: Fixed a major bug, and re-uploaded the re-extracted point clouds [here](https://drive.google.com/drive/folders/1tdTQDgu0lvJWxMu-xOOLxg-ilVos0EB9?usp=sharing).
 
 ## Setup
 ```
