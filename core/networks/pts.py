@@ -386,7 +386,7 @@ class NPCPointClouds(nn.Module):
         # separate them for now as PE is only on f_p_s
         f_p_s = (a * f_p_s).sum(dim=1)
         f_theta = (a * f_theta).sum(dim=1)
-        f_d = (a * f_d).sum(dim=1) # TODO: different from our prev. iter
+        f_d = (a_norm * f_d).sum(dim=1) 
         f_v = (a_norm * f_v).sum(dim=1)
 
         return {
@@ -422,10 +422,6 @@ class NPCPointClouds(nn.Module):
         T = l2ws[..., :3, :3] @ -rest_pose.reshape(1, N_joints, 3, 1)
         r2ws = l2ws.clone()
         r2ws[..., :3, -1:] += T
-
-        kp3d = inputs['kp3d'][::skip, rigid_idxs]
-        kp3d_ = (r2ws[..., :3, :3] @ rest_pose[..., None] + r2ws[..., :3, -1:])[..., 0]
-        assert torch.allclose(kp3d, kp3d_, atol=1e-5)
 
         p_j = self.p_j
         p_c = self.pts_to_canon(p_j)

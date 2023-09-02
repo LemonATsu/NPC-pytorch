@@ -128,7 +128,6 @@ class Vector3DFeaturesLatent(nn.Module):
         self.latent_to_feat = nn.Sequential(
             ParallelLinear(n_vols, n_in, (n_out - n_ind) * feat_res),
         )
-
         if not self.without_map:
             self.mapper = nn.Linear(n_out - n_ind, n_out - n_ind)
     

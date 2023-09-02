@@ -186,7 +186,7 @@ def train(config: DictConfig):
             tqdm.write(output_str)
 
             writer.add_video("TestRGB", preds['rgb_imgs'].permute(0, 3, 1, 2)[None], i, fps=5)
-            writer.add_video("TestDisp", preds['disp_imgs'].permute(0, 3, 1, 2)[None], i, fps=5)
+            writer.add_video("TestDisp", preds['disp_imgs'].permute(0, 3, 1, 2)[None].expand(-1, -1, 3, -1, -1), i, fps=5)
 
 
 @hydra.main(version_base='1.3', config_path=CONFIG_BASE, config_name='danbo_vof.yaml')
