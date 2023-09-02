@@ -274,7 +274,7 @@ class NPCPointClouds(nn.Module):
         is_pc: bool = False,
     ):
         vol_scale = self.get_axis_scale(rigid_idxs=self.rigid_idxs)
-        if pc_info is None:
+        if pc_info is None or is_pc:
             pc_info = self.get_deformed_pc_info(inputs, is_pc=is_pc)
         
         vw = inputs['vw']
@@ -368,7 +368,6 @@ class NPCPointClouds(nn.Module):
         r = rearrange(r, 'g j p d -> (g j p) d')[posed_knn_idxs]
         f_v = (vd * r).sum(dim=-1, keepdim=True)
 
-
         # get beta for RBF
         beta = rearrange(self.get_pts_beta(), 'j p d -> (j p) d')[knn_idxs]
 
@@ -398,7 +397,7 @@ class NPCPointClouds(nn.Module):
             'a_sum': a_sum,
         }
 
-    def get_deformed_pc_info(self, inputs: Mapping[str, Any], **kwargs):
+    def get_deformed_pc_info(self, inputs: Mapping[str, Any], is_pc: bool = False):
         """ 
         apply pose-dependent deformation to the point clouds
         """
@@ -427,30 +426,35 @@ class NPCPointClouds(nn.Module):
         p_c = self.pts_to_canon(p_j)
 
         bone_align_T = self.pts_embedder.get_bone_align_T(rigid_idxs=rigid_idxs)
+
+        # w2ajs: world to aligned-joint space
+        w2ajs = bone_align_T[None] @ skts
+        w2ajs = rearrange(w2ajs, 'g j a b -> g j 1 a b')
+        aj2ws = w2ajs.inverse()
+
         deform_info = self.deform_net(
             p_j,
             p_c,
             r2ws=r2ws,
+            aj2ws=aj2ws,
             pose=inputs['pose_pe'],
             lbs_weights=self.lbs_weights,
             lbs_masks=self.lbs_masks,
             bone_align_T=bone_align_T,
             t=t,
             bones=bones,
+            detach_deform=is_pc, # detach gradient when doing eikonal for stability
         )
 
         # get deformed point clouds in bone-aligned space
         # -> for querying bone-relative features and compute bone-to-surface-point vector
-        w2aj = bone_align_T[None] @ skts
-        w2aj = rearrange(w2aj, 'g j a b -> g j 1 a b')
         p_w = deform_info['p_w']
-        p_b = (w2aj[..., :3, :3] @ p_w[..., None] + w2aj[..., :3, -1:])[..., 0]
+        p_b = (w2ajs[..., :3, :3] @ p_w[..., None] + w2ajs[..., :3, -1:])[..., 0]
 
         r = self.get_bone_to_surface_vector(p_b)
-        aj2w = w2aj.inverse()
-        r_w = (aj2w[..., :3, :3] @ r[..., None])[..., 0]
+        r_w = (aj2ws[..., :3, :3] @ r[..., None])[..., 0]
 
-        aj2w = rearrange(aj2w, 'g j 1 a b -> g j a b')
+        aj2w = rearrange(aj2ws, 'g j 1 a b -> g j a b')
 
         deform_info.update(p_b=p_b, r=r, r_w=r_w, aj2w=aj2w)
 

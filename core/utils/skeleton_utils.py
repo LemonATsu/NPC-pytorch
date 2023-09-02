@@ -63,6 +63,7 @@ def rotate_y(theta):
                      [-sin,  0,  cos, 0],
                      [0,   0,      0, 1]], dtype=np.float32)
 
+
 def translate(tx, ty, tz):
     return np.array([[1, 0, 0, tx],
                      [0, 1, 0, ty],
@@ -541,7 +542,7 @@ def get_axis_aligned_rotation(vec):
     # note: we care only about the projection on z-axis
     # note: reference point is on z, so if x is negative, then we are in 3 or 4th quadrant
     theta = arccos_safe(vec_xz[-1]) * np.sign(vec_xz[0])
-    rot_y = rotate_y(theta)
+    rot_y = rotate_y(theta).T
     rotated_y = rot_y[:3, :3] @ vec
 
     # then, find rotation around x-axis

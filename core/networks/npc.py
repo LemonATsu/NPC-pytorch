@@ -80,7 +80,7 @@ class NPC(DANBO):
         if self.use_global_view:
             self.global_view_posi_enc = PositionalEncoding(3, num_freqs=4)
             self.input_ch_view += self.global_view_posi_enc.dims
-
+        
     def init_density_net(self):
 
         W = self.W

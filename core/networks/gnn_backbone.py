@@ -488,6 +488,7 @@ class NPCGNNFiLM(MixGNN):
         max_deform: float = 0.04,
         pts_per_volume: int = 200,
         deform_scale: float = 0.01,
+        clamp_deform: bool = True,
         **kwargs,
     ):
         """
@@ -502,6 +503,7 @@ class NPCGNNFiLM(MixGNN):
         self.max_deform = max_deform
         self.pts_per_volume = pts_per_volume
         self.deform_scale = deform_scale
+        self.clamp_deform = clamp_deform
 
 
         super(NPCGNNFiLM, self).__init__(*args, **kwargs)
@@ -607,14 +609,13 @@ class NPCGNNFiLM(MixGNN):
         p_j: torch.Tensor,
         p_c: torch.Tensor,
         r2ws: torch.Tensor,
+        aj2ws: torch.Tensor,
         pose: torch.Tensor,
         lbs_weights: torch.Tensor,
         lbs_masks: torch.Tensor,
-        bone_align_T: torch.Tensor,
-        clamp_deform: bool = True,
         t: Optional[torch.Tensor] = None,
         bones: Optional[torch.Tensor] = None,
-        use_smpl_lbs: bool =False,
+        detach_deform: bool =False,
         **kwargs,
     ):
         """ 
@@ -622,24 +623,26 @@ class NPCGNNFiLM(MixGNN):
         pc_j: ponits in canonical space
         """
         # get FiLM condition from poses
-        # TODO: apply lbs?
+        # dp: space is in joint space
+        film = super().forward(pose)
+        f_theta, dp = self.predict_nl_deform(p_j, film, aj2ws)
+
+        # deformation before clamping
+        dp_uc = dp.clone()
+        if self.clamp_deform:
+            dp = clamp_deform_to_max(dp, self.max_deform)
+        
+        if detach_deform:
+            dp = dp.detach()
+            lbs_weights = lbs_weights.detach()
+
         p_lbs = self.lbs(
             p_j, 
             p_c, 
             r2ws,
             lbs_weights, 
             lbs_masks,
-            use_smpl_lbs=use_smpl_lbs,
         )
-        
-        # dp: space is in joint space
-        film = super().forward(pose)
-        f_theta, dp = self.predict_nl_deform(p_j, film, bone_align_T)
-
-        # deformation before clamping
-        dp_uc = dp.clone()
-        if clamp_deform:
-            dp = clamp_deform_to_max(dp, self.max_deform)
         p_w = dp + p_lbs
 
         return {
@@ -654,8 +657,7 @@ class NPCGNNFiLM(MixGNN):
         self,
         p_j: torch.Tensor,
         film: torch.Tensor,
-        bone_align_T: torch.Tensor,
-        t: Optional[torch.Tensor] = None,
+        aj2ws: torch.Tensor,
         **kwargs
     ):
         """ 
@@ -672,10 +674,9 @@ class NPCGNNFiLM(MixGNN):
 
         p_j = rearrange(p_j, 'j p d -> 1 p j d')
         z = rearrange(
-                p_j.expand(N_graphs, -1, -1, -1),
-                'g p j d -> (g p) j d'
-            )
-
+            p_j.expand(N_graphs, -1, -1, -1),
+            'g p j d -> (g p) j d'
+        )
 
         film = rearrange(
             film[:, None].expand(-1, N_pts, -1, -1), 
@@ -703,10 +704,9 @@ class NPCGNNFiLM(MixGNN):
         vol_scale = rearrange(vol_scale, 'j d -> 1 j 1 d')
         dp = dp * vol_scale * self.deform_scale
 
-        # apply unalignment matrix
+        # apply unalignment matrix and transformation to world
         # note that dp is direction, so we only need to apply the rotation
-        R = rearrange(bone_align_T[..., :3, :3], 'j a b -> 1 j 1 b a') # transpose for undo
-        # would not do anything if bone_align_T is identity
+        R = aj2ws[..., :3, :3]
         dp = (R @ dp[..., None])[..., 0]
 
         return f_theta, dp
