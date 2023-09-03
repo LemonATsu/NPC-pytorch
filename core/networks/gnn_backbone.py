@@ -634,6 +634,7 @@ class NPCGNNFiLM(MixGNN):
         
         if detach_deform:
             dp = dp.detach()
+            dp_uc = dp_uc.detach()
             lbs_weights = lbs_weights.detach()
 
         p_lbs = self.lbs(
@@ -644,9 +645,12 @@ class NPCGNNFiLM(MixGNN):
             lbs_masks,
         )
         p_w = dp + p_lbs
+        # un-clampped version for loss computation
+        p_w_uc = dp_uc + p_lbs
 
         return {
             'p_w': p_w,
+            'p_w_uc': p_w_uc,
             'dp': dp,
             'dp_uc': dp_uc,
             'p_lbs': p_lbs,
@@ -702,7 +706,8 @@ class NPCGNNFiLM(MixGNN):
         # apply deformation scale
         vol_scale = self.get_axis_scale(rigid_idxs=self.rigid_idxs)
         vol_scale = rearrange(vol_scale, 'j d -> 1 j 1 d')
-        dp = dp * vol_scale * self.deform_scale
+        # directly predict in unscaled space
+        dp = dp * self.deform_scale
 
         # apply unalignment matrix and transformation to world
         # note that dp is direction, so we only need to apply the rotation

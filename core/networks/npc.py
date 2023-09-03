@@ -69,7 +69,8 @@ class NPC(DANBO):
         bone_feat_dims = self.pts_config.bone_config.n_out
         pose_feat_dims = self.deform_config.n_pose_feat
         self.voxel_posi_enc = instantiate(voxel_posi_enc, input_dims=pts_feat_dims)
-        self.input_ch = self.voxel_posi_enc.dims + bone_feat_dims + pose_feat_dims
+        # plus one for bone-to-surface vector projeciton
+        self.input_ch = self.voxel_posi_enc.dims + bone_feat_dims + pose_feat_dims + 1
         if self.add_film:
             self.input_ch = self.input_ch + 32
         
@@ -399,11 +400,12 @@ class NPC(DANBO):
         f_p_s = encoded_q['f_p_s']
         f_theta = encoded_q['f_theta']
         f_d = encoded_q['f_d']
+        f_r = encoded_q['f_r']
         f_p_s = self.voxel_posi_enc(f_p_s, weights=encoded_q['a_sum'])[0]
 
         
         # TODO: omit further triming points for now. 
-        density_inputs = torch.cat([f_p_s, f_theta, f_d], dim=-1)
+        density_inputs = torch.cat([f_p_s, f_theta, f_d, f_r], dim=-1)
         if self.add_film:
             pc_info = encoded_q['pc_info']
             film = pc_info['t_film'][unique_idxs]
@@ -542,7 +544,7 @@ class NPC(DANBO):
         if encoded is not None:
             pc_info = encoded['pc_info']
             pc_constraints = encoded.get('pc_constraints', None)
-            to_collect = ['dp', 'dp_uc', 'p_w', 'pc_sigma', 'pc_grad']
+            to_collect = ['dp', 'dp_uc', 'p_w', 'p_w_uc', 'pc_sigma', 'pc_grad']
             for k in to_collect:
                 if k in pc_info: 
                     ret[k] = pc_info[k]

@@ -93,6 +93,8 @@ class NPCPointClouds(nn.Module):
         selected_dict = self.select_init_pts(p_j, p_c, pts_per_volume)
         p_j = selected_dict['p_j']
         p_c = selected_dict['p_c']
+        # TODO: hack
+        self.pts_idxs_ = selected_dict['pts_idxs']
 
         # init LBS weights
         hop_masks, nb_joints = find_n_hops_joint_neighbors(
@@ -178,6 +180,8 @@ class NPCPointClouds(nn.Module):
             init_beta_ = (torch.tensor(init_beta_).exp() - 1.).log()
 
             pts_beta = init_beta_ #_.clamp(min=init_beta)
+            import pdb; pdb.set_trace()
+            print
 
         self.register_parameter(
             'pts_beta',
@@ -193,7 +197,7 @@ class NPCPointClouds(nn.Module):
             selected_idxs = farthest_point_sampling(
                 p,
                 pts_per_volume
-            ).sort().values
+            )#.sort().values
             selected_p_j.append(p[selected_idxs])
             selected_p_c.append(p_c_[selected_idxs])
             pts_idxs.append(selected_idxs)
@@ -298,7 +302,9 @@ class NPCPointClouds(nn.Module):
         )
         
         encoded_q = self.compute_feature(
+            p_b,
             p_bs,
+            q_b,
             q_bs,
             vd,
             vw=vw,
@@ -313,7 +319,9 @@ class NPCPointClouds(nn.Module):
     
     def compute_feature(
         self,
+        p_b: torch.Tensor,
         p_bs: torch.Tensor,
+        q_b: torch.Tensor,
         q_bs: torch.Tensor,
         vd: torch.Tensor,
         knn_info: Mapping[str, torch.Tensor],
@@ -368,6 +376,10 @@ class NPCPointClouds(nn.Module):
         r = rearrange(r, 'g j p d -> (g j p) d')[posed_knn_idxs]
         f_v = (vd * r).sum(dim=-1, keepdim=True)
 
+        q_b = rearrange(q_b, 'q j d -> (q j) d')[knn_vol_idxs]
+        p_b = rearrange(p_b, 'g j p d -> (g j p) d')[posed_knn_idxs]
+        f_r = ((q_b - p_b) * r).sum(dim=-1, keepdim=True)
+
         # get beta for RBF
         beta = rearrange(self.get_pts_beta(), 'j p d -> (j p) d')[knn_idxs]
 
@@ -387,12 +399,14 @@ class NPCPointClouds(nn.Module):
         f_theta = (a * f_theta).sum(dim=1)
         f_d = (a_norm * f_d).sum(dim=1) 
         f_v = (a_norm * f_v).sum(dim=1)
+        f_r = (a_norm * f_r).sum(dim=1)
 
         return {
             'f_p_s': f_p_s,
             'f_theta': f_theta,
             'f_d': f_d,
             'f_v': f_v,
+            'f_r': f_r,
             'a': a,
             'a_sum': a_sum,
         }
@@ -448,7 +462,7 @@ class NPCPointClouds(nn.Module):
 
         # get deformed point clouds in bone-aligned space
         # -> for querying bone-relative features and compute bone-to-surface-point vector
-        p_w = deform_info['p_w']
+        p_w = deform_info['p_w'] 
         p_b = (w2ajs[..., :3, :3] @ p_w[..., None] + w2ajs[..., :3, -1:])[..., 0]
 
         r = self.get_bone_to_surface_vector(p_b)

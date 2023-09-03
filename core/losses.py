@@ -218,7 +218,7 @@ class PointCloudsNeighborLoss(BaseLoss):
         if weight == 0.:
             return torch.tensor(0.), {}
         # deformed anchor location in world space
-        p_w = preds['p_w']
+        p_w = preds['p_w'] if not 'p_w_uc' in preds else preds['p_w_uc']
 
         N_graphs, N_joints, N_pts, _ = p_w.shape
 
