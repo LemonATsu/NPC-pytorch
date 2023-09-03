@@ -27,6 +27,7 @@ class NPC(DANBO):
         sdf_B_init: float = 0.1,
         use_global_view: bool = False,
         add_film: bool = False,
+        use_f_r: bool = True,
         **kwargs,
     ):
         self.constraint_pts = constraint_pts
@@ -35,6 +36,7 @@ class NPC(DANBO):
         self.pts_config = pts_config
         self.use_global_view = use_global_view
         self.add_film = add_film
+        self.use_f_r = use_f_r
 
         super(NPC, self).__init__(*args, **kwargs)
         self.init_pts(pts_config, deform_config)
@@ -69,8 +71,12 @@ class NPC(DANBO):
         bone_feat_dims = self.pts_config.bone_config.n_out
         pose_feat_dims = self.deform_config.n_pose_feat
         self.voxel_posi_enc = instantiate(voxel_posi_enc, input_dims=pts_feat_dims)
+        self.input_ch = self.voxel_posi_enc.dims + bone_feat_dims + pose_feat_dims
+
         # plus one for bone-to-surface vector projeciton
-        self.input_ch = self.voxel_posi_enc.dims + bone_feat_dims + pose_feat_dims + 1
+        if self.use_f_r:
+            self.input_ch += 1
+
         if self.add_film:
             self.input_ch = self.input_ch + 32
         
@@ -405,7 +411,10 @@ class NPC(DANBO):
 
         
         # TODO: omit further triming points for now. 
-        density_inputs = torch.cat([f_p_s, f_theta, f_d, f_r], dim=-1)
+        feat_list = [f_p_s, f_theta, f_d]
+        if self.use_f_r:
+            feat_list.append(f_r)
+        density_inputs = torch.cat(feat_list, dim=-1)
         if self.add_film:
             pc_info = encoded_q['pc_info']
             film = pc_info['t_film'][unique_idxs]
