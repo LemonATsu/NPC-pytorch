@@ -445,7 +445,7 @@ class NPC(DANBO):
         p_cts = rearrange(p_cts, 'g j p d -> g (j p) d', j=N_joints)
 
         encode_inputs = {
-            'pts': p_cts,
+            'pts': p_cts.detach(), # detach --> don't use this to udate location
             'rays_o': rays_o,
             'rays_d': rays_d,
             'skts': skts,
