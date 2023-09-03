@@ -93,8 +93,6 @@ class NPCPointClouds(nn.Module):
         selected_dict = self.select_init_pts(p_j, p_c, pts_per_volume)
         p_j = selected_dict['p_j']
         p_c = selected_dict['p_c']
-        # TODO: hack
-        self.pts_idxs_ = selected_dict['pts_idxs']
 
         # init LBS weights
         hop_masks, nb_joints = find_n_hops_joint_neighbors(
