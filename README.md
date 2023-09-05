@@ -7,6 +7,7 @@
 >ICCV 2023
 
 ### Updates
+- Sep 4, 2023: Code updated with some bug fixes.
 - Sep 2, 2023: Fixed a major bug, and re-uploaded the re-extracted point clouds [here](https://drive.google.com/drive/folders/1tdTQDgu0lvJWxMu-xOOLxg-ilVos0EB9?usp=sharing).
 
 This repo also supports [DANBO](https://github.com/LemonATsu/DANBO-pytorch) training. 

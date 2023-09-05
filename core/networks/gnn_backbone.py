@@ -615,7 +615,6 @@ class NPCGNNFiLM(MixGNN):
         lbs_masks: torch.Tensor,
         t: Optional[torch.Tensor] = None,
         bones: Optional[torch.Tensor] = None,
-        detach_deform: bool =False,
         **kwargs,
     ):
         """ 
@@ -631,11 +630,6 @@ class NPCGNNFiLM(MixGNN):
         dp_uc = dp.clone()
         if self.clamp_deform:
             dp = clamp_deform_to_max(dp, self.max_deform)
-        
-        if detach_deform:
-            dp = dp.detach()
-            dp_uc = dp_uc.detach()
-            lbs_weights = lbs_weights.detach()
 
         p_lbs = self.lbs(
             p_j, 
@@ -644,6 +638,7 @@ class NPCGNNFiLM(MixGNN):
             lbs_weights, 
             lbs_masks,
         )
+
         p_w = dp + p_lbs
         # un-clampped version for loss computation
         p_w_uc = dp_uc + p_lbs
@@ -704,10 +699,8 @@ class NPCGNNFiLM(MixGNN):
         
         f_theta, dp = torch.split(z, [self.n_pose_feat, 3], dim=-1)
         # apply deformation scale
-        vol_scale = self.get_axis_scale(rigid_idxs=self.rigid_idxs)
-        vol_scale = rearrange(vol_scale, 'j d -> 1 j 1 d')
         # directly predict in unscaled space
-        dp = dp * self.deform_scale
+        dp = dp * self.deform_scale 
 
         # apply unalignment matrix and transformation to world
         # note that dp is direction, so we only need to apply the rotation
@@ -723,7 +716,6 @@ class NPCGNNFiLM(MixGNN):
         r2ws: torch.Tensor,
         lbs_weights: torch.Tensor,
         lbs_masks: torch.Tensor,
-        use_smpl_lbs: bool = False,
         **kwargs
     ):
         # TODO: 'predict' may not be the right term
@@ -731,17 +723,14 @@ class NPCGNNFiLM(MixGNN):
         # -> reshape p_j to (N_pts, N_joints, 3) for api
 
         # Step 1: get final lbs weights
-        if not use_smpl_lbs:
-            p_j = rearrange(p_j, 'j p d -> p j d')
-            lbs_residual = rearrange(
-                self.blend_network(p_j),
-                'p j d -> j p d'
-            )
-            lbs_logits = lbs_weights + lbs_residual
-            invalid = 1 - lbs_masks
-            lbs_weights = softmax_invalid(lbs_logits, invalid)
-        else:
-            lbs_weights = lbs_weights.detach()
+        p_j = rearrange(p_j, 'j p d -> p j d')
+        lbs_residual = rearrange(
+            self.blend_network(p_j),
+            'p j d -> j p d'
+        )
+        lbs_logits = lbs_weights + lbs_residual
+        invalid = 1 - lbs_masks
+        lbs_weights = softmax_invalid(lbs_logits, invalid)
 
         # Step 2: do the actual lbs
         p_lbs = self._lbs(p_c, lbs_weights, r2ws)
@@ -761,6 +750,7 @@ class NPCGNNFiLM(MixGNN):
         T = rearrange(T, 'g j a b -> g 1 1 j a b', a=4, b=4)
         # expand to have (N_graphs, N_joints, N_pts, N_joints, 1, 1)
         w = rearrange(w, 'j p k -> 1 j p k 1 1')
+
         T_lbs = (w * T).sum(dim=3)
         p_lbs =  (T_lbs[..., :3, :3] @ p_c + T_lbs[..., :3, -1:])[..., 0]  
 

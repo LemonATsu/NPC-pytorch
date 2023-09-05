@@ -126,13 +126,8 @@ class NPC(DANBO):
         """ Initialize point cloud network
         """
         N_joints = len(self.rigid_idxs)
-
-        bone_centers = self.pts_embedder.unalign_pts(
-            torch.zeros(1, N_joints, 3),
-            rigid_idxs=self.rigid_idxs,
-        )
         
-        bone_centers = self.rest_pose[None, self.rigid_idxs] + bone_centers
+        bone_centers = self.rest_pose[None, self.rigid_idxs]
 
         deform_net = instantiate(
             deform_config,
@@ -454,7 +449,7 @@ class NPC(DANBO):
         p_cts = rearrange(p_cts, 'g j p d -> g (j p) d', j=N_joints)
 
         encode_inputs = {
-            'pts': p_cts.detach(), # detach --> don't use this to udate location
+            'pts': p_cts, 
             'rays_o': rays_o,
             'rays_d': rays_d,
             'skts': skts,

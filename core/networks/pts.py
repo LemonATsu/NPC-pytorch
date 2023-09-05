@@ -298,7 +298,7 @@ class NPCPointClouds(nn.Module):
             q_bs,
             pose_idxs=pose_idxs,
         )
-        
+
         encoded_q = self.compute_feature(
             p_b,
             p_bs,
@@ -357,13 +357,8 @@ class NPCPointClouds(nn.Module):
         c_p = rearrange(c_p, 'j (g p) d -> (g j p) d', g=N_graphs)[posed_knn_idxs]
         f_d = c_p - c_q
 
-        if is_pc:
-            # detach for faster speed
-            # TODO: maybe don't need the dropout trick
-            f_d = f_d.detach()
 
         # get f_v
-
         if self.use_global_view:
             assert vw is not None
             vw_idxs = knn_vol_idxs // N_joints
@@ -398,6 +393,11 @@ class NPCPointClouds(nn.Module):
         f_d = (a_norm * f_d).sum(dim=1) 
         f_v = (a_norm * f_v).sum(dim=1)
         f_r = (a_norm * f_r).sum(dim=1)
+
+
+        if is_pc:
+            # detach because 2nd order grid sampling backward is too slow 
+            f_d = f_d.detach()
 
         return {
             'f_p_s': f_p_s,
@@ -455,7 +455,6 @@ class NPCPointClouds(nn.Module):
             bone_align_T=bone_align_T,
             t=t,
             bones=bones,
-            detach_deform=is_pc, # detach gradient when doing eikonal for stability
         )
 
         # get deformed point clouds in bone-aligned space
@@ -481,7 +480,6 @@ class NPCPointClouds(nn.Module):
         pose_idxs: torch.Tensor,
         **kwargs,
     ):
-        # TODO: add back volume blocking?
         N_pts = q_w.shape[0]
         N_graphs, N_joints, N_pts_v = p_w.shape[:3]
         knn_vols = self.knn_vols
