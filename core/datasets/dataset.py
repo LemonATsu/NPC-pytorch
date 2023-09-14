@@ -564,6 +564,10 @@ class BaseH5Dataset(Dataset):
         # get the subset idxs to collect the right data
         k_idxs, c_idxs, i_idxs, kq_idxs, cq_idxs = self._get_subset_idxs()
 
+        # keep only the unique ones
+        k_idxs = np.unique(k_idxs)
+        c_idxs = np.unique(c_idxs)
+
         # prepare HWF
         H, W = self.HW
         if not np.isscalar(self.focals):
@@ -585,6 +589,7 @@ class BaseH5Dataset(Dataset):
             betas = betas[k_idxs]
         betas = betas.mean(0, keepdims=True).repeat(len(betas), 0)
 
+        
         data_attrs = {
             'hwf': hwf,
             'center': center,

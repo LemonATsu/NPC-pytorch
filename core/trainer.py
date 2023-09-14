@@ -191,7 +191,7 @@ class Trainer(object):
         batch['N_unique'] = self.full_config.N_sample_images // device_cnt
         batch['device_cnt'] = device_cnt
         batch['global_iter'] = global_iter
-        preds = self.model(batch)
+        preds = self.model(batch, pose_opt=self.config.get('pose_opt', False))
 
         # Step 2. compute loss
         # TODO: used to have pose-optimization here ..

@@ -165,7 +165,7 @@ class NPC(DANBO):
             _recursive_=False
         )
 
-    def forward_rays(self, batch: Mapping[str, Any], render_normal: bool = False, **kwargs):
+    def forward_rays(self, batch: Mapping[str, Any], render_normal: bool = False, pose_opt: bool = False, **kwargs):
 
         if 'rays_o' not in batch and 'rays_d' not in batch:
             raise NotImplementedError('Rays are not provided as input. '
@@ -179,6 +179,16 @@ class NPC(DANBO):
         # Step 2. model evaluation
         # TODO: do we need a get_nerf_inputs function?
         network_inputs = self.get_network_inputs(batch, pts, z_vals)
+        if pose_opt and self.pose_opt is not None:
+            # TODO: is this a good way?
+            network_inputs = self.pose_opt(
+                network_inputs=network_inputs,
+                kp3d=network_inputs['kp3d'],
+                bones=network_inputs['bones'],
+                kp_idxs=network_inputs['real_kp_idx'],
+                N_unique=network_inputs['N_unique'],
+            )
+
         raw, encoded = self.evaluate_pts(
             network_inputs, 
             coarse=True,

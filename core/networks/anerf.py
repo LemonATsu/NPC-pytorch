@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from tqdm import trange
 
 from .embedding import Optcodes
 from hydra.utils import instantiate
@@ -149,6 +148,7 @@ class ANeRF(nn.Module):
         density_noise_std: float = 1.0,
         bkgd_net: Optional[DictConfig] = None,
         cam_cal: Optional[DictConfig] = None,
+        pose_opt: Optional[DictConfig] = None,
         **kwargs,
     ):
         '''
@@ -201,6 +201,15 @@ class ANeRF(nn.Module):
         self.cam_cal = None
         if cam_cal is not None:
             self.cam_cal = CamCal(**cam_cal)
+        
+        self.pose_opt = None
+        if pose_opt is not None:
+            self.pose_opt = instantiate(
+                pose_opt, 
+                rest_pose=self.rest_pose, 
+                skel_type=self.skel_type,
+                **kwargs
+            )
     
     @property
     def dnet_input(self):
@@ -311,7 +320,7 @@ class ANeRF(nn.Module):
         else:
             raise NotImplementedError(f'Unknown forward type {forward_type}')
     
-    def forward_rays(self, batch: Mapping[str, Any], **kwargs):
+    def forward_rays(self, batch: Mapping[str, Any], pose_opt: bool = False, **kwargs):
 
         if 'rays_o' not in batch and 'rays_d' not in batch:
             raise NotImplementedError(
@@ -327,6 +336,16 @@ class ANeRF(nn.Module):
         # Step 2. model evaluation
         # TODO: do we need a get_nerf_inputs function?
         network_inputs = self.get_network_inputs(batch, pts, z_vals)
+        if pose_opt and self.pose_opt is not None:
+            # TODO: is this a good way?
+            network_inputs = self.pose_opt(
+                network_inputs=network_inputs,
+                kp3d=network_inputs['kp3d'],
+                bones=network_inputs['bones'],
+                kp_idxs=network_inputs['real_kp_idx'],
+                N_unique=network_inputs['N_unique'],
+            )
+
         raw, encoded = self.evaluate_pts(network_inputs, coarse=True)
 
         if raw is None:
