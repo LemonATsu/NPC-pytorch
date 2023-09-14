@@ -7,7 +7,7 @@ import random
 import numpy as np
 from torch.utils.data import Dataset, ConcatDataset
 
-from core.pose_opt import pose_ckpt_to_pose_data
+from core.networks.pose_opt import pose_ckpt_to_pose_data
 from core.utils.skeleton_utils import (
     SMPLSkeleton, 
     cylinder_to_box_2d, 
