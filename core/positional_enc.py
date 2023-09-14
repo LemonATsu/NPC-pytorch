@@ -140,7 +140,7 @@ class CutoffPositionalEncoding(PositionalEncoding):
     def get_cutoff_dist(self):
         return self.cutoff_dist
 
-    def _embed(self, inputs: torch.Tensor, dists: Optional[torch.Tensor] = None, masks: Optional[torch.Tensor] = None):
+    def _embed(self, inputs: torch.Tensor, dists: Optional[torch.Tensor] = None, masks: Optional[torch.Tensor] = None, **kwargs):
 
         if self.dist_inputs:
             # assume that we have 1-to-1 correspondence between inputs and dists!

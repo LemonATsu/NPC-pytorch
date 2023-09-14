@@ -32,3 +32,7 @@ model:
     N_samples: 48
     N_importance: 32
   
+losses:
+  NeRFRGBLoss:
+    fine: 1.0
+    coarse: 1.0
