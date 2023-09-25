@@ -1,6 +1,6 @@
 # NPC: Neural Point Characters from Video
 
-### [Paper](https://https://arxiv.org/abs/2304.02013) | [Supplementary](https://lemonatsu.github.io/files/npc/supp.pdf) | [Website](https://lemonatsu.github.io/npc/) 
+### [Paper](https://arxiv.org/abs/2304.02013) | [Supplementary](https://lemonatsu.github.io/files/npc/supp.pdf) | [Website](https://lemonatsu.github.io/npc/) 
 ![](imgs/front.png)
 >**NPC: Neural Point Characters from Video**\
 >[Shih-Yang Su](https://lemonatsu.github.io/), [Timur Bagautdinov](https://scholar.google.ch/citations?user=oLi7xJ0AAAAJ&hl=en), and [Helge Rhodin](http://helge.rhodin.de/)\
