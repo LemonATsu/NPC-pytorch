@@ -43,7 +43,7 @@ You can download pre-extracted point clouds [here](https://drive.google.com/driv
 ### NPC training
 Then, you can train NPC with the following command:
 ```
-python train.py --config-name npc --basedir logs  expname=NPC_h36m_S9 dataset.subject=S9
+python train.py --config-name npc basedir=logs  expname=NPC_h36m_S9 dataset.subject=S9
 ```
 The `config-name npc` corresponds to config file `configs/npc.yaml`, and `dataset.subject=S9` overwrite dataset related configuration, which can be found in `configs/dataset/`. The training logs and checkpoints will be saved in `logs/NPC_h36m_S9/`.
 
