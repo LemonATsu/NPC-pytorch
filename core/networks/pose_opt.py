@@ -124,6 +124,9 @@ class PoseOpt(nn.Module):
         rest_pose = self.rest_pose.clone()
 
         embs = self.pose_embs(torch.arange(len(rvecs)))
+        if self.rot_6d:
+            rvecs = axisang_to_rot6d(rvecs)
+        rvecs = rearrange(rvecs, 'b j d -> b (j d)')
 
         x = torch.cat([rvecs, embs], dim=-1)
         residual = self.refine_net(x) * self.residual_scale
