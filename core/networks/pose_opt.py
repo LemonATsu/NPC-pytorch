@@ -35,7 +35,8 @@ class PoseOpt(nn.Module):
         self.skel_type = skel_type
         self.n_embs = n_embs if n_embs is not None else len(kp3d)
         self.residual_scale = residual_scale
-
+        self.rot_6d = rot_6d
+        
         rvecs = torch.tensor(bones)
         # NOTE: this is different from original A-NeRF implementation, but should 
         # work better
